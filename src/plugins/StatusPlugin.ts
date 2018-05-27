@@ -1,8 +1,8 @@
-import {Plugin} from "../app/Plugin";
+import {Plugin} from "../plugin/Plugin";
 import {Router} from "express";
 
 
-export class StatusPlugin implements Plugin {
+export class StatusPlugin extends Plugin {
     public readonly name = 'status';
 
     private isConnected: boolean = false;

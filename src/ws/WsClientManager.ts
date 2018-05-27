@@ -1,7 +1,7 @@
 import {Server as HttpServer} from "http";
 import WebSocket, {Server as WsServer} from 'ws';
-import {WsHandler, WsHandlerMap} from "./WsHandler";
-import {Plugin} from "../app/Plugin";
+import {WsHandlerMap} from "./WsHandler";
+import {Plugin} from "../plugin/Plugin";
 
 export class WsClientManager {
     private server: WsServer;

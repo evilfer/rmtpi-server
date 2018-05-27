@@ -1,10 +1,10 @@
-import {Plugin} from "../../app/Plugin";
+import {Plugin} from "../../plugin/Plugin";
 import {Request, Response, Router} from "express";
 import ReadableStream = NodeJS.ReadableStream;
 import {WEBCAM_PAGE} from "./webcam-page";
 
 
-export class WebcamPlugin implements Plugin {
+export class WebcamPlugin extends Plugin {
     public readonly name = 'webcam';
 
     private sendMsg: null | ((payload: any) => void) = null;
@@ -93,9 +93,6 @@ export class WebcamPlugin implements Plugin {
                 this.removeOutput(res);
             })
         });
-    }
-
-    public processMessage(payload: any): void {
     }
 
     private get clientConnected() {

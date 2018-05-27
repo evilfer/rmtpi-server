@@ -1,8 +1,10 @@
 import http, {Server} from "http";
 import express, {Express} from "express";
-import {Plugin} from "./Plugin";
+import expressSession from 'express-session';
 import {WsClientManager} from "../ws/WsClientManager";
 import ProcessEnv = NodeJS.ProcessEnv;
+import {Plugin} from "../plugin/Plugin";
+import {authMiddleware} from "./auth";
 
 
 export class RmtPiApp {
@@ -22,11 +24,17 @@ export class RmtPiApp {
     private prepareRoutes() {
         const app = express();
 
+        app.use(expressSession({secret: 'keyboard cat', resave: true, saveUninitialized: true}));
+
+        const authRouter = authMiddleware(app, this.env);
+
         this.plugins.forEach(plugin => {
             const router = express.Router();
             plugin.prepareRoutes(router);
-            app.use(`/${plugin.name}`, router);
+            authRouter.use(`/${plugin.name}`, router);
         });
+
+        app.use('/', authRouter);
 
         return app;
     }
