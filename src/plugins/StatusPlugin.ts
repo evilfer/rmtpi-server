@@ -17,8 +17,8 @@ export class StatusPlugin extends Plugin {
         this.status = '...';
     }
 
-    public prepareRoutes(router: Router): void {
-        router.get('/', (req, res) => res.send(this.statusText))
+    public prepareRoutes(webRouter: Router, piRouter: Router): void {
+        webRouter.get('/', (req, res) => res.send(this.statusText))
     }
 
     public processMessage(payload: any): void {

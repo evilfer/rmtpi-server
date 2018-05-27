@@ -62,7 +62,7 @@ export function authMiddleware(router: Router, env: ProcessEnv) {
         }
     });
 
-    router.get('/logout', (req: Request, res: Response) => {
+    router.get('/auth/logout', (req: Request, res: Response) => {
         req.logout();
         res.redirect('/auth/status');
     });

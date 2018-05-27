@@ -56,8 +56,8 @@ export class WebcamPlugin extends Plugin {
         this.sendMsg = send;
     }
 
-    public prepareRoutes(router: Router): void {
-        router.post('/stream.mpg', (req: Request, res: Response) => {
+    public prepareRoutes(webRouter: Router, piRouter: Router): void {
+        piRouter.post('/stream.mpg', (req: Request, res: Response) => {
             console.log('received stream');
             this.input = {stream: req, stop: () => res.end()};
 
@@ -73,11 +73,11 @@ export class WebcamPlugin extends Plugin {
             });
         });
 
-        router.get('/', (req: Request, res: Response) => {
+        webRouter.get('/', (req: Request, res: Response) => {
             res.send(WEBCAM_PAGE);
         });
 
-        router.get('/stream.mpg', (req: Request, res: Response) => {
+        webRouter.get('/stream.mpg', (req: Request, res: Response) => {
             console.log('stream request');
 
             if (!this.clientConnected) {

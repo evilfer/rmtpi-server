@@ -29,9 +29,12 @@ export class RmtPiApp {
         const authRouter = authMiddleware(app, this.env);
 
         this.plugins.forEach(plugin => {
-            const router = express.Router();
-            plugin.prepareRoutes(router);
-            authRouter.use(`/${plugin.name}`, router);
+            const webRouter = express.Router();
+            const piRouter = express.Router();
+
+            plugin.prepareRoutes(webRouter, piRouter);
+            authRouter.use(`/${plugin.name}`, webRouter);
+            app.use(`/${plugin.name}`, piRouter);
         });
 
         app.use('/', authRouter);

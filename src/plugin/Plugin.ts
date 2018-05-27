@@ -11,7 +11,7 @@ export abstract class Plugin implements WsHandler, HttpHandler {
     public clientReady(send: (payload: any) => void): void {
     }
 
-    public prepareRoutes(router: Router): void {
+    public prepareRoutes(webRouter: Router, piRouter: Router): void {
     }
 
     public processMessage(payload: any): void {

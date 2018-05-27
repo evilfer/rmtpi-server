@@ -1,5 +1,5 @@
 import {Router} from "express";
 
 export interface HttpHandler {
-    prepareRoutes(router: Router): void;
+    prepareRoutes(webRouter: Router, piRouter: Router): void;
 }
