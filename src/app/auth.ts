@@ -6,8 +6,10 @@ import {Request, Response, Router} from "express";
 
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-function ensureAuthenticated(req: Request, res: Response, next: any) {
-    return req.isAuthenticated() ?  next() : res.redirect('/auth/google');
+function genEnsureAuthenticated(users: string[]) {
+    return (req: Request, res: Response, next: any) =>
+        req.isAuthenticated() && users.indexOf(req.session!.passport.user.id) >= 0 ?
+            next() : res.redirect('/auth/google');
 }
 
 export function authMiddleware(router: Router, env: ProcessEnv) {
@@ -28,13 +30,12 @@ export function authMiddleware(router: Router, env: ProcessEnv) {
 
     const callback = (request: any, accessToken: any, refreshToken: any, profile: any, cb: (err: Error | null, profile: any | null) => any) => {
         process.nextTick(() => {
-            if (users.indexOf(profile.id) >= 0) {
-                cb(null, profile);
-            } else {
-                cb(null, null);
-            }
+            cb(null, profile);
         });
     };
+
+    const ensureAuthenticated = genEnsureAuthenticated(users);
+
 
     passport.use(new GoogleStrategy(options, callback));
 
@@ -50,16 +51,17 @@ export function authMiddleware(router: Router, env: ProcessEnv) {
     router.use(passport.session());
 
     router.get('/auth/status', (req: Request, res: Response) => {
-        const user = req.session && req.session.passport && req.session.passport.user;
-
-        if (user) {
-            const emails = user.emails
+        const user = req.isAuthenticated() && req.session!.passport.user || null;
+        const userData = user && {
+            displayName: user.displayName,
+            emails: user.emails
                 .filter((email: any) => email.type === 'account')
-                .map((email: any) => email.value);
-            res.send(`${user.displayName} [${emails.join(', ')}] (${user.id})`);
-        } else {
-            res.send('not logged in');
-        }
+                .map((email: any) => email.value),
+            id: user.id,
+            valid: users.indexOf(user.id) >= 0
+        };
+
+        res.json(userData);
     });
 
     router.get('/auth/logout', (req: Request, res: Response) => {
@@ -68,7 +70,11 @@ export function authMiddleware(router: Router, env: ProcessEnv) {
     });
 
     router.get('/auth/google',
-        passport.authenticate('google', {scope: ['email'], failureRedirect: '/auth/status'}));
+        passport.authenticate('google', {
+            scope: ['email'],
+            failureRedirect: '/auth/status',
+            prompt: 'consent'
+        }));
 
     router.get('/auth/google/callback',
         passport.authenticate('google', {failureRedirect: '/auth/status'}),

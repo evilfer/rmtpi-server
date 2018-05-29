@@ -6,28 +6,29 @@ export class StatusPlugin extends Plugin {
     public readonly name = 'status';
 
     private isConnected: boolean = false;
-    private status: string = '';
+    private publicIp: null | string = null;
 
     public clientDisconnected(): void {
         this.isConnected = false;
+        this.publicIp = null;
     }
 
     public clientReady(send: (payload: any) => void): void {
         this.isConnected = true;
-        this.status = '...';
     }
 
     public prepareRoutes(webRouter: Router, piRouter: Router): void {
-        webRouter.get('/', (req, res) => res.send(this.statusText))
+        webRouter.get('/', (req, res) => res.json(this.statusData))
     }
 
     public processMessage(payload: any): void {
-        this.status = payload as string;
+        this.publicIp = payload.publicIp;
     }
 
-    private get statusText() {
-        return this.isConnected ?
-            `Connected: ${this.status}` :
-            'Disconnected';
+    private get statusData() {
+        return {
+            connected: this.isConnected,
+            publicIp: this.publicIp
+        };
     }
 }

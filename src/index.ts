@@ -5,8 +5,7 @@ import {WebcamPlugin} from "./plugins/webcam/WebcamPlugin";
 
 function run() {
     const plugins = [
-        new StatusPlugin(),
-        new WebcamPlugin()
+        new StatusPlugin()
     ];
 
     const app = new RmtPiApp(process.env, plugins);
